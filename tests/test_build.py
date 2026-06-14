@@ -89,6 +89,20 @@ def test_og_tags_escape_special_chars(tmp_path):
     assert "&quot;" in html
 
 
+def test_code_highlighting_survives_build(tmp_path):
+    cfg = setup_site(tmp_path)
+    content = Path(cfg.build.content_dir)
+    (content / "code.md").write_text(
+        "---\ntitle: Code\ndate: 2026-06-10\n---\n\n"
+        "```python\ndef f():\n    return 1\n```\n",
+        encoding="utf-8",
+    )
+    build(cfg, today=datetime.date(2026, 6, 14))
+    html = (Path(cfg.build.output_dir) / "code" / "index.html").read_text()
+    assert 'class="highlight"' in html
+    assert 'class="k"' in html  # Pygments keyword token survived sanitization
+
+
 def test_malicious_tag_does_not_escape_output_dir(tmp_path):
     cfg = setup_site(tmp_path)
     content = Path(cfg.build.content_dir)

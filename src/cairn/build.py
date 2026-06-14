@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime
 import html
+import re
 import shutil
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -11,6 +12,8 @@ from cairn.content import Content, ContentError, discover, filter_content, load_
 from cairn.feeds import render_json_feed, render_robots, render_rss, render_sitemap
 from cairn.render import Renderer, markdown_to_html
 from cairn.security import headers_file, meta_csp_tag, sanitize
+
+_IMG_TAG = re.compile(r"<img\b[^>]*>", re.IGNORECASE)
 
 
 @dataclass
@@ -142,12 +145,20 @@ def build(
 
 
 def check(config: Config) -> list[str]:
-    """Validate all content and return a list of error strings (empty == OK)."""
+    """Validate all content; return a list of error strings (empty == OK).
+
+    Reports malformed frontmatter and images that are missing alt text.
+    """
     errors: list[str] = []
     content_dir = Path(config.build.content_dir)
     for path in sorted(content_dir.rglob("*.md")):
         try:
-            load_content(path)
+            item = load_content(path)
         except ContentError as exc:
             errors.append(str(exc))
+            continue
+        rendered = markdown_to_html(item.body)
+        for tag in _IMG_TAG.findall(rendered):
+            if not re.search(r"\balt\s*=", tag, re.IGNORECASE):
+                errors.append(f"{path}: image is missing alt text: {tag}")
     return errors

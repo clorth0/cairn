@@ -78,6 +78,19 @@ def test_unknown_deploy_target_raises(tmp_path):
         load_config(path)
 
 
+def test_unknown_key_raises(tmp_path):
+    path = write(tmp_path, """
+        [site]
+        title = "t"
+        url = "https://example.com"
+        author = "a"
+        description = "d"
+        bogus = "x"
+    """)
+    with pytest.raises(ConfigError):
+        load_config(path)
+
+
 def test_negative_feed_limit_raises(tmp_path):
     path = write(tmp_path, """
         [site]

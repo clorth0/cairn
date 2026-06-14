@@ -127,6 +127,19 @@ def test_datetime_frontmatter_is_coerced_to_date(tmp_path):
     assert type(c.date) is datetime.date
 
 
+def test_malicious_slug_is_sanitized(tmp_path):
+    p = make(tmp_path, "evil.md", """
+        ---
+        title: Evil
+        slug: ../../../etc/passwd
+        ---
+        body
+    """)
+    c = load_content(p)
+    assert "/" not in c.slug
+    assert ".." not in c.slug
+
+
 def test_filter_excludes_drafts_and_future_by_default():
     today = datetime.date(2026, 6, 14)
     items = [

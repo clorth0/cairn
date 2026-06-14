@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime
 import json
 import xml.etree.ElementTree as ET
 
@@ -45,7 +46,13 @@ def render_json_feed(posts: list[Content], config: Config) -> str:
                 "id": _abs_url(config, post.slug),
                 "url": _abs_url(config, post.slug),
                 "title": post.title,
-                "date_published": post.date.isoformat() if post.date else None,
+                "date_published": (
+                    datetime.datetime.combine(
+                        post.date, datetime.time.min, tzinfo=datetime.timezone.utc
+                    ).isoformat()
+                    if post.date
+                    else None
+                ),
             }
             for post in posts[: config.build.feed_limit]
         ],

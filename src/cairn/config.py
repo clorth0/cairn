@@ -6,6 +6,14 @@ from pathlib import Path
 
 VALID_TARGETS = {"folder", "github-pages", "cloudflare"}
 
+_KNOWN_SECTIONS = {"site", "build", "security", "deploy"}
+_KNOWN_KEYS = {
+    "site": {"title", "url", "author", "description", "language"},
+    "build": {"content_dir", "output_dir", "theme", "feed_limit"},
+    "security": {"csp", "referrer_policy", "sanitize", "hsts"},
+    "deploy": {"target"},
+}
+
 
 class ConfigError(Exception):
     """Raised when site.toml is missing required fields or has bad values."""
@@ -63,6 +71,16 @@ def load_config(path: str | Path) -> Config:
         raise ConfigError(f"config file not found: {path}") from exc
     except tomllib.TOMLDecodeError as exc:
         raise ConfigError(f"invalid TOML in {path}: {exc}") from exc
+
+    unknown_sections = set(data) - _KNOWN_SECTIONS
+    if unknown_sections:
+        raise ConfigError(f"unknown config section(s): {sorted(unknown_sections)}")
+    for section, allowed in _KNOWN_KEYS.items():
+        table = data.get(section, {})
+        if isinstance(table, dict):
+            unknown = set(table) - allowed
+            if unknown:
+                raise ConfigError(f"[{section}] has unknown key(s): {sorted(unknown)}")
 
     site_raw = data.get("site")
     if not isinstance(site_raw, dict):

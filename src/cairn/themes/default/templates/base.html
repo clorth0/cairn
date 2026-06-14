@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 {{ meta_csp | safe }}
-<title>{{ page_title }} &middot; {{ site.title }}</title>
+<title>{% if page_title and page_title != site.title %}{{ page_title }} &middot; {% endif %}{{ site.title }}</title>
 {% if meta_description %}<meta name="description" content="{{ meta_description }}">{% endif %}
 {{ og_tags | safe }}
 <link rel="stylesheet" href="/style.css">

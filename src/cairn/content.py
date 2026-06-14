@@ -73,7 +73,7 @@ def load_content(path: str | Path) -> Content:
 
     return Content(
         title=str(title),
-        slug=str(meta.get("slug") or slugify(path.stem)),
+        slug=slugify(str(meta.get("slug"))) if meta.get("slug") else slugify(path.stem),
         body=body,
         source_path=path,
         description=meta.get("description"),

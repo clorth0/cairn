@@ -15,11 +15,35 @@ _PERMISSIONS_POLICY = (
 )
 
 
+def _content_attributes() -> dict[str, set[str]]:
+    """nh3's default allowed attributes, plus `class` on code/formatting tags.
+
+    Allowing `class` lets build-time Pygments highlighting survive sanitization.
+    It is safe under Cairn's locked CSP (no scripts, no external/inline styles):
+    a class attribute cannot execute code or load resources.
+    """
+    try:
+        base = {tag: set(attrs) for tag, attrs in nh3.ALLOWED_ATTRIBUTES.items()}
+    except AttributeError:  # pragma: no cover - older nh3 without the constant
+        base = {"a": {"href", "title"}, "img": {"src", "alt", "title"}}
+    for tag in ("code", "pre", "span", "div", "table", "thead", "tbody", "tr", "th", "td"):
+        base.setdefault(tag, set()).add("class")
+    return base
+
+
+_CONTENT_ATTRIBUTES = _content_attributes()
+
+
 def sanitize(html: str, allowed_tags: set[str] | None = None) -> str:
-    """Strip dangerous markup from rendered HTML using nh3's safe allowlist."""
-    if allowed_tags is None:
-        return nh3.clean(html)
-    return nh3.clean(html, tags=allowed_tags)
+    """Strip dangerous markup from rendered HTML using nh3.
+
+    Uses nh3's safe tag allowlist and url-scheme filtering (so `javascript:`
+    URLs and event handlers are still removed), but permits `class` on
+    code/formatting tags so Pygments syntax highlighting survives.
+    """
+    if allowed_tags is not None:
+        return nh3.clean(html, tags=allowed_tags)
+    return nh3.clean(html, attributes=_CONTENT_ATTRIBUTES)
 
 
 def build_csp(security: SecurityConfig) -> str:
