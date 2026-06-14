@@ -1,0 +1,9 @@
+<h1>Archive</h1>
+<ul class="archive-list">
+{% for post in posts %}
+  <li>
+    {% if post.date %}<time datetime="{{ post.date }}">{{ post.date }}</time>{% endif %}
+    <a href="/{{ post.slug }}/">{{ post.title }}</a>
+  </li>
+{% endfor %}
+</ul>

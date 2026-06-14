@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="{{ site.language }}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+{{ meta_csp | safe }}
+<title>{{ page_title }} &middot; {{ site.title }}</title>
+{% if meta_description %}<meta name="description" content="{{ meta_description }}">{% endif %}
+{{ og_tags | safe }}
+<link rel="stylesheet" href="/style.css">
+<link rel="alternate" type="application/rss+xml" href="/feed.xml" title="{{ site.title }}">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+  <a class="site-title" href="/">{{ site.title }}</a>
+  <nav><a href="/archive/">Archive</a></nav>
+</header>
+<main id="main">
+{{ content | safe }}
+</main>
+<footer class="site-footer">
+  <p>&copy; {{ site.author }}. Built with Cairn.</p>
+</footer>
+</body>
+</html>
