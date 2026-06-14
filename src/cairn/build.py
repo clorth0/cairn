@@ -6,7 +6,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from cairn.config import Config
-from cairn.content import Content, discover, filter_content
+from cairn.content import Content, ContentError, discover, filter_content, load_content
 from cairn.feeds import render_json_feed, render_robots, render_rss, render_sitemap
 from cairn.render import Renderer, markdown_to_html
 from cairn.security import headers_file, meta_csp_tag, sanitize
@@ -133,3 +133,15 @@ def build(
                 shutil.copyfile(asset, out / asset.name)
 
     return result
+
+
+def check(config: Config) -> list[str]:
+    """Validate all content and return a list of error strings (empty == OK)."""
+    errors: list[str] = []
+    content_dir = Path(config.build.content_dir)
+    for path in sorted(content_dir.rglob("*.md")):
+        try:
+            load_content(path)
+        except ContentError as exc:
+            errors.append(str(exc))
+    return errors
