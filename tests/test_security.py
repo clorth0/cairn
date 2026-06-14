@@ -46,6 +46,11 @@ def test_build_csp_custom_passthrough():
     assert build_csp(SecurityConfig(csp=custom)) == custom
 
 
+def test_build_csp_locked_is_case_insensitive():
+    assert build_csp(SecurityConfig(csp="LOCKED")) == LOCKED_CSP
+    assert build_csp(SecurityConfig(csp="Locked")) == LOCKED_CSP
+
+
 def test_security_headers_include_hsts_when_enabled():
     headers = security_headers(cfg(hsts=True))
     assert "Strict-Transport-Security" in headers

@@ -8,7 +8,11 @@ from jinja2.sandbox import SandboxedEnvironment
 
 
 def markdown_to_html(text: str) -> str:
-    """Convert Markdown to HTML with build-time syntax highlighting (CSS classes)."""
+    """Convert Markdown to HTML with build-time syntax highlighting (CSS classes).
+
+    The output may contain raw HTML present in the source Markdown. Callers MUST
+    pass this through ``security.sanitize()`` before marking it safe in a template.
+    """
     converter = markdown.Markdown(
         extensions=["fenced_code", "codehilite", "tables", "toc"],
         extension_configs={

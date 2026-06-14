@@ -23,7 +23,7 @@ def sanitize(html: str, allowed_tags: set[str] | None = None) -> str:
 
 
 def build_csp(security: SecurityConfig) -> str:
-    if security.csp == "locked":
+    if security.csp.strip().lower() == "locked":
         return LOCKED_CSP
     return security.csp
 

@@ -114,6 +114,19 @@ def test_discover_finds_markdown_recursively(tmp_path):
     assert {c.title for c in items} == {"A", "B"}
 
 
+def test_datetime_frontmatter_is_coerced_to_date(tmp_path):
+    p = make(tmp_path, "ts.md", """
+        ---
+        title: Stamped
+        date: 2026-06-14 12:30:00
+        ---
+        body
+    """)
+    c = load_content(p)
+    assert c.date == datetime.date(2026, 6, 14)
+    assert type(c.date) is datetime.date
+
+
 def test_filter_excludes_drafts_and_future_by_default():
     today = datetime.date(2026, 6, 14)
     items = [

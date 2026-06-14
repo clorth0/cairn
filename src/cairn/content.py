@@ -62,6 +62,8 @@ def load_content(path: str | Path) -> Content:
         raise ContentError(f"{path}: missing required 'title' in frontmatter")
 
     date = meta.get("date")
+    if isinstance(date, datetime.datetime):
+        date = date.date()
     if date is not None and not isinstance(date, datetime.date):
         raise ContentError(f"{path}: 'date' must be a date (YYYY-MM-DD), got {date!r}")
 

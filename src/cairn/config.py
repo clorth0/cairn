@@ -76,11 +76,14 @@ def load_config(path: str | Path) -> Config:
     )
 
     build_raw = data.get("build", {})
+    feed_limit = int(build_raw.get("feed_limit", 20))
+    if feed_limit < 0:
+        raise ConfigError("[build] feed_limit must be zero or a positive integer")
     build = BuildConfig(
         content_dir=str(build_raw.get("content_dir", "content")),
         output_dir=str(build_raw.get("output_dir", "public")),
         theme=str(build_raw.get("theme", "default")),
-        feed_limit=int(build_raw.get("feed_limit", 20)),
+        feed_limit=feed_limit,
     )
 
     sec_raw = data.get("security", {})
