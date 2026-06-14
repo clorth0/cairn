@@ -29,3 +29,15 @@ def test_check_returns_nonzero_on_bad_content(tmp_path, monkeypatch):
 def test_unknown_command_returns_error(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
     assert main(["bogus"]) == 2
+
+
+def test_check_warns_on_security_downgrade_but_passes(tmp_path, monkeypatch, capsys):
+    monkeypatch.chdir(tmp_path)
+    main(["new", "site", "."])
+    toml = (tmp_path / "site.toml").read_text(encoding="utf-8")
+    (tmp_path / "site.toml").write_text(
+        toml.replace("sanitize = true", "sanitize = false"), encoding="utf-8"
+    )
+    capsys.readouterr()  # drop scaffold output
+    assert main(["check"]) == 0
+    assert "warning" in capsys.readouterr().err.lower()

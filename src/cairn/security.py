@@ -79,3 +79,24 @@ def meta_csp_tag(config: Config) -> str:
     """Fallback CSP for hosts (e.g. GitHub Pages) that cannot set HTTP headers."""
     csp = build_csp(config.security).replace('"', "&quot;")
     return f'<meta http-equiv="Content-Security-Policy" content="{csp}">'
+
+
+def security_advisories(config: Config) -> list[str]:
+    """Non-fatal warnings about a weakened security posture.
+
+    Surfaced by `cairn check`. These flag deliberate-choice downgrades, not
+    errors, so they never fail the build; they just make the trade-off visible.
+    """
+    notes: list[str] = []
+    sec = config.security
+    if not sec.sanitize:
+        notes.append(
+            "HTML sanitization is disabled (security.sanitize = false); "
+            "raw HTML in content will be emitted unsanitized."
+        )
+    if build_csp(sec) != LOCKED_CSP:
+        notes.append(
+            "Content-Security-Policy is not the locked preset; "
+            "verify your custom CSP is sufficiently restrictive."
+        )
+    return notes

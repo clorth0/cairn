@@ -8,6 +8,7 @@ from cairn.build import build, check
 from cairn.config import ConfigError, load_config
 from cairn.deploy import emit
 from cairn.scaffold import new_post, new_site
+from cairn.security import security_advisories
 from cairn.serve import serve
 
 CONFIG_NAME = "site.toml"
@@ -90,6 +91,8 @@ def main(argv: list[str] | None = None) -> int:
         if args.command == "check":
             cfg = _load(args)
             errors = check(cfg)
+            for note in security_advisories(cfg):
+                print(f"warning: {note}", file=sys.stderr)
             if errors:
                 for err in errors:
                     print(f"error: {err}", file=sys.stderr)

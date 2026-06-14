@@ -6,6 +6,7 @@ from cairn.security import (
     security_headers,
     headers_file,
     meta_csp_tag,
+    security_advisories,
     LOCKED_CSP,
 )
 
@@ -73,3 +74,17 @@ def test_meta_csp_tag_contains_policy():
     tag = meta_csp_tag(cfg())
     assert tag.startswith('<meta http-equiv="Content-Security-Policy"')
     assert "default-src 'none'" in tag
+
+
+def test_security_advisories_silent_for_locked_defaults():
+    assert security_advisories(cfg()) == []
+
+
+def test_security_advisories_flags_disabled_sanitize():
+    notes = security_advisories(cfg(sanitize=False))
+    assert any("saniti" in n.lower() for n in notes)
+
+
+def test_security_advisories_flags_custom_csp():
+    notes = security_advisories(cfg(csp="default-src 'self'"))
+    assert any("content-security-policy" in n.lower() for n in notes)
