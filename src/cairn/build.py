@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 import datetime
+import html
 import shutil
 from dataclasses import dataclass, field
 from pathlib import Path
 
 from cairn.config import Config
-from cairn.content import Content, ContentError, discover, filter_content, load_content
+from cairn.content import Content, ContentError, discover, filter_content, load_content, slugify
 from cairn.feeds import render_json_feed, render_robots, render_rss, render_sitemap
 from cairn.render import Renderer, markdown_to_html
 from cairn.security import headers_file, meta_csp_tag, sanitize
@@ -20,13 +21,16 @@ class BuildResult:
 
 
 def _og_tags(config: Config, title: str, description: str | None) -> str:
+    site_name = html.escape(config.site.title, quote=True)
+    esc_title = html.escape(title, quote=True)
     parts = [
-        f'<meta property="og:site_name" content="{config.site.title}">',
-        f'<meta property="og:title" content="{title}">',
+        f'<meta property="og:site_name" content="{site_name}">',
+        f'<meta property="og:title" content="{esc_title}">',
         '<meta name="twitter:card" content="summary">',
     ]
     if description:
-        parts.append(f'<meta property="og:description" content="{description}">')
+        esc_desc = html.escape(description, quote=True)
+        parts.append(f'<meta property="og:description" content="{esc_desc}">')
     return "\n".join(parts)
 
 
@@ -105,6 +109,7 @@ def build(
     # Archive
     inner = renderer.render("archive.html", site=config.site, posts=posts)
     _write(out / "archive" / "index.html", page_shell("Archive", None, inner))
+    result.page_count += 1
 
     # Tag pages
     tags: dict[str, list[Content]] = {}
@@ -113,8 +118,9 @@ def build(
             tags.setdefault(tag, []).append(post)
     for tag, tagged in tags.items():
         inner = renderer.render("tag.html", site=config.site, tag=tag, posts=tagged)
-        _write(out / "tags" / tag / "index.html",
+        _write(out / "tags" / slugify(tag) / "index.html",
                page_shell(f"Tagged {tag}", None, inner))
+        result.page_count += 1
 
     # Feeds and discovery files
     _write(out / "feed.xml", render_rss(posts, config))

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+import yaml
 from pathlib import Path
 
 from cairn.content import slugify
@@ -42,7 +43,7 @@ Welcome to your new site. Edit `content/` and run `cairn build`.
 
 _POST_TEMPLATE = """\
 ---
-title: {title}
+{title_line}
 date: {date}
 tags: []
 draft: true
@@ -71,7 +72,11 @@ def new_post(
     content_dir.mkdir(parents=True, exist_ok=True)
     today = today or datetime.date.today()
     path = content_dir / f"{slugify(title)}.md"
+    title_line = yaml.safe_dump(
+        {"title": title}, default_flow_style=False, allow_unicode=True
+    ).strip()
     path.write_text(
-        _POST_TEMPLATE.format(title=title, date=today.isoformat()), encoding="utf-8"
+        _POST_TEMPLATE.format(title_line=title_line, date=today.isoformat()),
+        encoding="utf-8",
     )
     return path

@@ -2,7 +2,7 @@ from pathlib import Path
 
 from cairn.render import Renderer
 
-THEME = Path("themes/default")
+THEME = Path("src/cairn/themes/default")
 
 
 def test_base_template_renders_meta_csp_and_title():

@@ -14,9 +14,10 @@ CONFIG_NAME = "site.toml"
 
 
 def _bundled_default_theme() -> str:
-    """Resolve the packaged default theme path (repo layout: themes/default)."""
-    repo_theme = Path(__file__).resolve().parents[2] / "themes" / "default"
-    return str(repo_theme)
+    """Resolve the packaged default theme (works for wheel and editable installs)."""
+    from importlib.resources import files
+
+    return str(files("cairn").joinpath("themes", "default"))
 
 
 def _load(args) -> "Config":

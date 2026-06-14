@@ -3,7 +3,7 @@
   {% if post.date %}<time datetime="{{ post.date }}">{{ post.date }}</time>{% endif %}
   {% if post.tags %}
   <ul class="tags">
-  {% for tag in post.tags %}<li><a href="/tags/{{ tag }}/">{{ tag }}</a></li>{% endfor %}
+  {% for tag in post.tags %}<li><a href="/tags/{{ tag | slugify }}/">{{ tag }}</a></li>{% endfor %}
   </ul>
   {% endif %}
   <div class="post-body">{{ content | safe }}</div>

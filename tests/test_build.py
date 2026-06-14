@@ -5,7 +5,7 @@ from pathlib import Path
 from cairn.config import Config, SiteConfig, BuildConfig
 from cairn.build import build, BuildResult
 
-THEME = Path("themes/default").resolve()
+THEME = Path("src/cairn/themes/default").resolve()
 
 
 def setup_site(tmp_path):
@@ -73,3 +73,32 @@ def test_clean_removes_stale_files(tmp_path):
     (out / "stale.html").write_text("old", encoding="utf-8")
     build(cfg, today=datetime.date(2026, 6, 14), clean=True)
     assert not (out / "stale.html").exists()
+
+
+def test_og_tags_escape_special_chars(tmp_path):
+    cfg = setup_site(tmp_path)
+    content = Path(cfg.build.content_dir)
+    (content / "tricky.md").write_text(
+        '---\ntitle: \'He said "hi" <x>\'\ndate: 2026-06-10\n---\nbody',
+        encoding="utf-8",
+    )
+    build(cfg, today=datetime.date(2026, 6, 14))
+    html = (Path(cfg.build.output_dir) / "tricky" / "index.html").read_text()
+    # The raw unescaped attribute-breaking sequence must not appear in og:title.
+    assert 'content="He said "hi"' not in html
+    assert "&quot;" in html
+
+
+def test_malicious_tag_does_not_escape_output_dir(tmp_path):
+    cfg = setup_site(tmp_path)
+    content = Path(cfg.build.content_dir)
+    (content / "evil.md").write_text(
+        "---\ntitle: Evil\ndate: 2026-06-10\ntags: ['../../escape']\n---\nbody",
+        encoding="utf-8",
+    )
+    build(cfg, today=datetime.date(2026, 6, 14))
+    out = Path(cfg.build.output_dir)
+    # No file may be written outside the output directory.
+    assert not (out.parent / "escape").exists()
+    # The tag dir is slugified safely inside out/tags/.
+    assert any((out / "tags").iterdir())

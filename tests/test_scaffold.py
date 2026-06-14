@@ -23,3 +23,13 @@ def test_new_post_creates_loadable_content(tmp_path):
     assert item.title == "My First Post"
     assert item.date == datetime.date(2026, 6, 14)
     assert item.is_draft is True
+
+
+def test_new_post_with_special_chars_is_loadable(tmp_path):
+    content_dir = tmp_path / "content"
+    content_dir.mkdir()
+    path = new_post(content_dir, 'Tricky: A "Quoted" Title',
+                    today=datetime.date(2026, 6, 14))
+    item = load_content(path)
+    assert item.title == 'Tricky: A "Quoted" Title'
+    assert item.date == datetime.date(2026, 6, 14)

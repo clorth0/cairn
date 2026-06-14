@@ -28,7 +28,7 @@ cairn = "cairn.cli:main"
 where = ["src"]
 
 [tool.setuptools.package-data]
-cairn = ["../../themes/default/templates/*.html", "../../themes/default/static/*"]
+cairn = ["themes/default/templates/*.html", "themes/default/static/*"]
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]

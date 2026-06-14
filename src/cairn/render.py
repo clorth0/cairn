@@ -6,6 +6,8 @@ import markdown
 from jinja2 import FileSystemLoader, select_autoescape
 from jinja2.sandbox import SandboxedEnvironment
 
+from cairn.content import slugify
+
 
 def markdown_to_html(text: str) -> str:
     """Convert Markdown to HTML with build-time syntax highlighting (CSS classes).
@@ -32,6 +34,7 @@ class Renderer:
             loader=FileSystemLoader(str(theme_dir / "templates")),
             autoescape=select_autoescape(["html", "xml"]),
         )
+        self.env.filters["slugify"] = slugify
 
     def render(self, template_name: str, **context) -> str:
         return self.env.get_template(template_name).render(**context)
