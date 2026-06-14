@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cairn-ssg"
+version = "0.1.0"
+description = "A minimal, security-first static site generator."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Matt James" }]
+dependencies = [
+    "markdown>=3.6",
+    "jinja2>=3.1",
+    "pygments>=2.17",
+    "PyYAML>=6.0",
+    "nh3>=0.2.17",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
+[project.scripts]
+cairn = "cairn.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+cairn = ["../../themes/default/templates/*.html", "../../themes/default/static/*"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
