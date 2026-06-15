@@ -1,0 +1,9 @@
+<h1>{{ site.title }}</h1>
+<ul class="post-list">
+{% for post in posts %}
+  <li>
+    <a href="/{{ post.slug }}/">{{ post.title }}</a>
+    {% if post.date %}<time datetime="{{ post.date }}">{{ post.date }}</time>{% endif %}
+  </li>
+{% endfor %}
+</ul>
