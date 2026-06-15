@@ -10,6 +10,29 @@ readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
 authors = [{ name = "Matt James" }]
+keywords = [
+    "static-site-generator",
+    "ssg",
+    "markdown",
+    "blog",
+    "security",
+    "zero-javascript",
+    "csp",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Internet :: WWW/HTTP :: Site Management",
+    "Topic :: Software Development :: Documentation",
+    "Topic :: Text Processing :: Markup :: Markdown",
+]
 dependencies = [
     "markdown>=3.6",
     "jinja2>=3.1",
@@ -20,6 +43,11 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest>=8.0"]
+
+[project.urls]
+Homepage = "https://github.com/clorth0/cairn"
+Repository = "https://github.com/clorth0/cairn"
+Issues = "https://github.com/clorth0/cairn/issues"
 
 [project.scripts]
 cairn = "cairn.cli:main"
